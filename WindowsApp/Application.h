@@ -1,7 +1,10 @@
 #pragma once
 
-#include <windows.h>
 #include <d3dx9.h>
+#include <stdio.h>
+#include <Windows.h>
+#include <windowsx.h>
+#include <d3d9helper.h>
 
 #pragma comment (lib, "d3d9.lib")
 //#pragma comment (lib, "D3dx9.lib")
