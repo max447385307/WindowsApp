@@ -72,3 +72,47 @@ HRESULT Mesh::Load(WCHAR fName[])
 	mtrlBuffer->Release();
 	return hr;
 }
+
+
+void Mesh::Render()
+{
+	int numMaterials = (int)m_materials.size();
+	
+	for (int i=0; i<numMaterials; i++)
+	{
+		if (m_textures[i] != NULL)
+		{
+			g_device->SetMaterial(&m_white);
+		}
+		else
+		{
+			g_device->SetMaterial(&m_materials[i]);
+		}
+
+		g_device->SetTexture(0, m_textures[i]);
+
+		m_pMesh->DrawSubset(i);
+	}
+}
+
+
+void Mesh::Release()
+{
+	if (m_pMesh != NULL)
+	{
+		m_pMesh->Release();
+		m_pMesh = NULL;
+	}
+
+	int numTexture = (int)m_textures.size();
+
+	for (int i=0; numTexture; i++)
+	{
+		if (m_textures[i] != NULL)
+		{
+			m_textures[i]->Release();
+		}
+	}
+	m_textures.clear();
+	m_materials.clear();
+}
