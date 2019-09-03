@@ -1,7 +1,6 @@
 #pragma once
 
 #include <d3dx9.h>
-#include <d3du>
 #include <vector>
 
 
@@ -11,10 +10,10 @@ class Mesh
 {
 public :
 	Mesh();
-	Mesh(WCHAR fName[]);
+	Mesh(LPCWSTR fName);
 	~Mesh();
 
-	HRESULT Load(WCHAR fname[]);
+	HRESULT Load(LPCWSTR fname);
 	void Render();
 	void Release();
 

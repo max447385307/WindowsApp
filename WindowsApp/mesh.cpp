@@ -13,17 +13,21 @@ Mesh::Mesh()
 }
 
 
-Mesh::Mesh(WCHAR fName[])
+Mesh::Mesh(LPCWSTR fName)
 {
 	m_pMesh = NULL;
 	Load(fName);
 }
 
-HRESULT Mesh::Load(WCHAR fName[])
+Mesh::~Mesh()
+{
+	Release();
+}
+
+HRESULT Mesh::Load(LPCWSTR fName)
 {
 	//release old resource
 	Release();
-
 	
 	m_white.Ambient = m_white.Specular = m_white.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_white.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);

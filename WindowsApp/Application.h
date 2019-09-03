@@ -6,6 +6,8 @@
 #include <windowsx.h>
 #include <d3d9helper.h>
 
+#include "mesh.h"
+
 #pragma comment (lib, "d3d9.lib")
 //#pragma comment (lib, "D3dx9.lib")
 
@@ -24,6 +26,9 @@ public:
 
 private: 
 	HWND m_mainWindow; 
-	D3DPRESENT_PARAMETERS m_present; bool m_deviceLost;
+	D3DPRESENT_PARAMETERS m_present; 
+	bool m_deviceLost;
+	Mesh m_soldier;
+	float m_angle;
 };
 
