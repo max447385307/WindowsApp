@@ -8,12 +8,12 @@
 
 #include "mesh.h"
 
-#pragma comment (lib, "d3d9.lib")
+//#pragma comment (lib, "d3d9.lib")
 //#pragma comment (lib, "D3dx9.lib")
 
 class Application
 {
-public: 
+public:  
 	Application(); 
 	~Application(); 
 	HRESULT Init(HINSTANCE hInstance, bool windowed);

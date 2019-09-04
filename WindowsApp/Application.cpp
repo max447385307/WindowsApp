@@ -70,6 +70,18 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
+Application::Application()
+{
+	m_angle = 0.0f;
+}
+
+Application::~Application()
+{
+	if (g_debug.good())
+	{
+		g_debug.close();
+	}
+}
 
 HRESULT Application::Init(HINSTANCE hInstance, bool windowed)
 {
@@ -82,8 +94,8 @@ HRESULT Application::Init(HINSTANCE hInstance, bool windowed)
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = WindowProc;
 	wc.hInstance = hInstance;
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;//tell windows leave background to us
+	//wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	//wc.hbrBackground = (HBRUSH)COLOR_WINDOW;//tell windows leave background to us
 	wc.lpszClassName = L"WindowClass1";
 
 
@@ -147,14 +159,14 @@ HRESULT Application::Init(HINSTANCE hInstance, bool windowed)
 	m_present.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	int vertexProcessingType = 0;
-	if (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
-	{
+	//if (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
+	//{
 		vertexProcessingType = D3DCREATE_HARDWARE_VERTEXPROCESSING;
-	}
-	else
-	{
-		vertexProcessingType = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-	}
+	//}
+	//else
+	//{
+	//	vertexProcessingType = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+	//}
 
 	if (FAILED(d3d9->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, m_mainWindow, vertexProcessingType, &m_present, &g_pDevice)))
 	{
@@ -170,8 +182,8 @@ HRESULT Application::Init(HINSTANCE hInstance, bool windowed)
 		MessageBox(NULL, (LPCWSTR)pErrorMsgs->GetBufferPointer(), L"effect error", MB_OK);
 		return E_FAIL;
 	}
-
-	m_soldier.Load(L"resources/meshes/soldier.x");
+	 char h[] = "resources/meshes/soldier.x";
+	m_soldier.Load(h);
 	m_deviceLost = false;
 
 	return S_OK;
@@ -281,8 +293,46 @@ void Application::Render()
 			D3DXMatrixLookAtLH(&view, &D3DXVECTOR3(cos(m_angle) * 2.0f, 2.0f, sin(m_angle)), &D3DXVECTOR3(0.0f, 1.0f, 0.0f), &D3DXVECTOR3(0.0f, 10.f, 0.0f));
 			D3DXMatrixPerspectiveFovLH(&proj, D3DX_PI / 4.0f, (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.f);
 
+			g_pDevice->SetTransform(D3DTS_WORLD, &world);
+			g_pDevice->SetTransform(D3DTS_VIEW, &view);
+			g_pDevice->SetTransform(D3DTS_PROJECTION, &proj);
+			g_pEffect->SetMatrix("matVP", &(view * proj));
 
+			g_pDevice->Clear(0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0);
 
+			if (SUCCEEDED(g_pDevice->BeginScene()))
+			{
+				{
+					g_pEffect->SetMatrix("matW", &identity);
+					g_pEffect->SetVector("lightPos", &lightPos);
+					D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Lighting");
+					g_pEffect->SetTechnique(hTech);
+					g_pEffect->Begin(NULL, NULL);
+					g_pEffect->BeginPass(0);
+
+					m_soldier.Render();
+
+					g_pEffect->EndPass();
+					g_pEffect->End();
+				}
+
+				{
+					g_pEffect->SetMatrix("matW", &shadow);
+					D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Shadow");
+					g_pEffect->SetTechnique(hTech);
+					g_pEffect->Begin(NULL, NULL);
+					g_pEffect->BeginPass(0);
+
+					m_soldier.Render();
+
+					g_pEffect->EndPass();
+					g_pEffect->End();
+				}
+
+				g_pDevice->EndScene();
+				g_pDevice->Present(0, 0, 0, 0);
+			}
+			
 
 		}
 		catch (...)
@@ -290,4 +340,21 @@ void Application::Render()
 
 		}
 	}
+}
+
+void Application::Cleanup()
+{
+	//Release all resources here...
+	//if (g_pSprite != NULL)	g_pSprite->Release();
+	//if (g_pFont != NULL)		g_pFont->Release();
+	if (g_pDevice != NULL)	g_pDevice->Release();
+	if (g_pEffect != NULL)	g_pEffect->Release();
+
+	g_debug << "Application Terminated \n";
+}
+
+void Application::Quit()
+{
+	DestroyWindow(m_mainWindow);
+	PostQuitMessage(0);
 }

@@ -2,7 +2,7 @@
 
 #pragma warning(disable:4996)
 
-extern IDirect3DDevice9* g_device;
+extern IDirect3DDevice9* g_pDevice;
 
 #define PATH_TO_TEXTURES "resources/meshes/"
 
@@ -13,18 +13,26 @@ Mesh::Mesh()
 }
 
 
-Mesh::Mesh(LPCWSTR fName)
+//Mesh::Mesh(LPCWSTR fName)
+//{
+//	m_pMesh = NULL;
+//	Load(fName);
+//}
+
+Mesh::Mesh(char fName[])
 {
 	m_pMesh = NULL;
 	Load(fName);
 }
+
 
 Mesh::~Mesh()
 {
 	Release();
 }
 
-HRESULT Mesh::Load(LPCWSTR fName)
+HRESULT Mesh::Load(char fName[])
+//HRESULT Mesh::Load(LPCWSTR fName)
 {
 	//release old resource
 	Release();
@@ -37,7 +45,7 @@ HRESULT Mesh::Load(LPCWSTR fName)
 	ID3DXBuffer* adjBuffer = NULL;
 	ID3DXBuffer* mtrlBuffer = NULL;
 	DWORD numMtrl = NULL;
-	HRESULT hr = D3DXLoadMeshFromX(fName, D3DXMESH_MANAGED, g_device, &adjBuffer, &mtrlBuffer, 0, &numMtrl, &m_pMesh);
+	HRESULT hr = D3DXLoadMeshFromXA(fName, D3DXMESH_MANAGED, g_pDevice, &adjBuffer, &mtrlBuffer, 0, &numMtrl, &m_pMesh);
 
 	if (FAILED(hr))
 	{
@@ -58,7 +66,7 @@ HRESULT Mesh::Load(LPCWSTR fName)
 				strcpy(textureFileName, PATH_TO_TEXTURES);
 				strcat(textureFileName, mtrls[i].pTextureFilename);
 				IDirect3DTexture9* tex = 0; 
-				D3DXCreateTextureFromFileA(g_device, textureFileName, &tex);
+				D3DXCreateTextureFromFileA(g_pDevice, textureFileName, &tex);
 				m_textures.push_back(tex);
 			}
 			else
@@ -86,14 +94,14 @@ void Mesh::Render()
 	{
 		if (m_textures[i] != NULL)
 		{
-			g_device->SetMaterial(&m_white);
+			g_pDevice->SetMaterial(&m_white);
 		}
 		else
 		{
-			g_device->SetMaterial(&m_materials[i]);
+			g_pDevice->SetMaterial(&m_materials[i]);
 		}
 
-		g_device->SetTexture(0, m_textures[i]);
+		g_pDevice->SetTexture(0, m_textures[i]);
 
 		m_pMesh->DrawSubset(i);
 	}

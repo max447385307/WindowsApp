@@ -10,10 +10,12 @@ class Mesh
 {
 public :
 	Mesh();
-	Mesh(LPCWSTR fName);
+	//Mesh(LPCWSTR fName);
+	Mesh(char fName[]);
 	~Mesh();
 
-	HRESULT Load(LPCWSTR fname);
+	//HRESULT Load(LPCWSTR fname);
+	HRESULT Load(char fName[]);
 	void Render();
 	void Release();
 
